@@ -10,9 +10,9 @@
     "description": "Controle seus gastos",
     "icons": [
       {
-        "src": "faveicon.png",
+        "src": "favicon.png",
         "type": "image/png",
-        "sizes": "2560x2560"
+        "sizes": "25x25"
       }
     ]
   }
