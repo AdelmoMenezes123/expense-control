@@ -1,6 +1,6 @@
 {
-    "short_name": "expanseControl",
-    "name": "expanseControl",
+    "short_name": "Expense Control",
+    "name": "Expense Control",
     "start_url": ".",
     "display": "standalone",
     "theme_color": "#9c88ff",

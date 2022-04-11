@@ -1,6 +1,6 @@
 const transactionsUl = document.querySelector('#transactions');
 const icomeDisplay = document.querySelector('#money-plus');
-const expanseDisplay = document.querySelector('#money-minus');
+const expenseDisplay = document.querySelector('#money-minus');
 const balancelDisplay = document.querySelector('#balance');
 const form = document.querySelector('#form');
 const inputTransactionName = document.querySelector('#text');
@@ -57,11 +57,11 @@ const updateBalanceValue = () => {
 	const transactionsAmount = transactions.map(({ amount }) => amount);
 	const total = getTotal(transactionsAmount)
 	const income = getIncome(transactionsAmount)
-	const expanse = getExpense(transactionsAmount)
+	const expense = getExpense(transactionsAmount)
 
 	balancelDisplay.textContent = `R$ ${total}`
 	icomeDisplay.textContent = `R$ ${income}`
-	expanseDisplay.textContent = `R$ ${expanse}`
+	expenseDisplay.textContent = `R$ ${expense}`
 }
 
 const init = () => {
