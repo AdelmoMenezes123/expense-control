@@ -1,9 +1,0 @@
-{
-  "name": "expanseControl",
-  "short_name": "expanseControl",
-  "theme_color": "#9c88ff",
-  "background_color": "#f7f7f7",
-  "display": "standalone",
-  "scope": "/index.html",
-  "start_url": "/"
-}

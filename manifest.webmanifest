@@ -1,0 +1,18 @@
+{
+    "short_name": "expanseControl",
+    "name": "expanseControl",
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#9c88ff",
+    "theme-color": "#9c88ff",
+    "background_color": "#f7f7f7",
+    "background-color": "#f7f7f7",
+    "description": "Controle seus gastos",
+    "icons": [
+      {
+        "src": "faveicon.png",
+        "type": "image/png",
+        "sizes": "2560x2560"
+      }
+    ]
+  }
