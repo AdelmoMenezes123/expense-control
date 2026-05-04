@@ -1,64 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
+  <head>
+    <meta name="theme-color" content="#f9f9f9" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="expense-control" href="https://expense-control-nu.vercel.app/" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Controle de despesas</title>
+  </head>
 
-<head>
-	<meta name="theme-color" content="#f9f9f9">
-	<link rel="apple-touch-icon" href="/favicon.png">
-	<link rel="manifest" href="manifest.webmanifest">
-	<link rel="expense-control" href="https://expense-control-nu.vercel.app/">
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<link rel="stylesheet" href="./style.css" />
-	<title>Controle de despesas</title>
-</head>
+  <body>
+    <h2>Controle de despesas</h2>
 
-<body>
-	<h2>Controle de despesas</h2>
+    <div class="container">
+      <div class="left-column">
+        <h4>Saldo atual</h4>
+        <h1 id="balance" class="balance">R$ 0.00</h1>
 
-	<div class="container">
-		<h4>Saldo atual</h4>
+        <div class="inc-exp-container">
+          <div>
+            <h4>Receitas</h4>
+            <p id="money-plus" class="money plus">+ R$0.00</p>
+          </div>
+          <div>
+            <h4>Despesas</h4>
+            <p id="money-minus" class="money minus">- R$0.00</p>
+          </div>
+        </div>
 
-		<h1 id="balance" class="balance">R$ 0.00</h1>
+        <h3>Adicionar transação</h3>
+        <div id="error-message" class="error-message"></div>
+        <form id="form">
+          <div class="form-control">
+            <label for="text">Nome</label>
+            <input autofocus type="text" id="text" placeholder="Nome da transação" maxlength="45" autocomplete="off" />
+          </div>
+          <div class="form-control">
+            <label for="amount"
+              >Valor <br />
+              <small>(negativo - despesas, positivo - receitas)</small>
+            </label>
+            <input type="text" id="amount" inputmode="numeric" placeholder="Valor da transação (ex: -15,00)" autocomplete="off" />
+          </div>
+          <div class="form-control">
+            <label for="date">Data da Transação</label>
+            <input type="date" id="date" class="form-control" autocomplete="off" />
+          </div>
+          <button class="btn">Adicionar</button>
+        </form>
+      </div>
 
-		<div class="inc-exp-container">
-			<div>
-				<h4>Receitas</h4>
-				<p id="money-plus" class="money plus">+ R$0.00</p>
-			</div>
+      <div class="right-column">
+        <div class="history-filter">
+          <h3>Consultar Histórico</h3>
+          <div class="filter-control flex-group">
+            <select id="history-month" autocomplete="off">
+              <option value="">Selecione um mês</option>
+              <option value="01">JANEIRO</option>
+              <option value="02">FEVEREIRO</option>
+              <option value="03">MARÇO</option>
+              <option value="04">ABRIL</option>
+              <option value="05">MAIO</option>
+              <option value="06">JUNHO</option>
+              <option value="07">JULHO</option>
+              <option value="08">AGOSTO</option>
+              <option value="09">SETEMBRO</option>
+              <option value="10">OUTUBRO</option>
+              <option value="11">NOVEMBRO</option>
+              <option value="12">DEZEMBRO</option>
+            </select>
+            <button class="btn btn-history" id="btn-history" type="button">Buscar</button>
+          </div>
+        </div>
 
-			<div>
-				<h4>Despesas</h4>
-				<p id="money-minus" class="money minus">- R$0.00</p>
-			</div>
-		</div>
+        <h3 id="current-month-title" style="margin-top: 20px">Transações do Mês Atual</h3>
+        <ul id="transactions" class="transactions"></ul>
+      </div>
 
-		<h3>Transações</h3>
+      <footer class="flutoante">
+        <a href="https://adelmo.vercel.app/" class="btn-portfolio" title="Meu Portfólio"> 🚀 </a>
+      </footer>
+    </div>
 
-		<ul id="transactions" class="transactions"></ul>
+    <!-- Modal de Histórico -->
+    <div id="history-modal" class="modal-overlay">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 id="modal-title">Relatório de Transações</h2>
+        <ul id="modal-transactions" class="transactions"></ul>
+        <button class="btn btn-print" onclick="window.print()">Imprimir Relatório</button>
+      </div>
+    </div>
 
-		<h3>Adicionar transação</h3>
+    <!-- Botão Flutuante do Portfólio -->
 
-		<form id="form">
-			<div class="form-control">
-				<label for="text">Nome</label>
-				<input autofocus type="text" id="text" placeholder="Nome da transação" />
-			</div>
-
-			<div class="form-control">
-				<label for="amount">Valor <br />
-					<small>(negativo - despesas, positivo - receitas)</small>
-				</label>
-				<input type="text" id="amount" inputmode="numeric" placeholder="Valor da transação (ex: -15,00)" />
-			</div>
-
-			<button class="btn">Adicionar</button>
-		</form>
-
-	</div>
-
-	<a href="https://adelmo.vercel.app/" class="btn-portfolio mt-5">Portfólio 🚀</a>
-	<script src="script.js"></script>
-	<script src="index.js"></script>
-</body>
-
+    <script src="script.js"></script>
+    <script src="index.js"></script>
+  </body>
 </html>

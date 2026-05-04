@@ -1,129 +1,222 @@
-const transactionsUl = document.querySelector('#transactions');
-const icomeDisplay = document.querySelector('#money-plus');
-const expenseDisplay = document.querySelector('#money-minus');
-const balancelDisplay = document.querySelector('#balance');
-const form = document.querySelector('#form');
-const inputTransactionName = document.querySelector('#text');
-const inputTransactionAmount = document.querySelector('#amount');
+const transactionsUl = document.querySelector("#transactions");
+const icomeDisplay = document.querySelector("#money-plus");
+const expenseDisplay = document.querySelector("#money-minus");
+const balancelDisplay = document.querySelector("#balance");
+const form = document.querySelector("#form");
+const inputTransactionName = document.querySelector("#text");
+const inputTransactionAmount = document.querySelector("#amount");
+const inputTransactionDate = document.querySelector("#date");
+const errorMessage = document.querySelector("#error-message");
 
-const localStorageTrasactions =
-	JSON.parse(localStorage.getItem('transactions'));
+const showError = (message) => {
+  errorMessage.textContent = message;
+  errorMessage.classList.add("show");
+  setTimeout(() => {
+    errorMessage.classList.remove("show");
+  }, 3000);
+};
 
-let transactions =
-	localStorage
-		.getItem('transactions') !== null
-		? localStorageTrasactions
-		: [];
+const localStorageTrasactions = (() => {
+  try {
+    return JSON.parse(localStorage.getItem("transactions"));
+  } catch (e) {
+    return [];
+  }
+})();
 
-const removeTransaction = ID => {
-	transactions =
-		transactions
-			.filter(({ id }) => id !== ID);
-	updateLocalStorage();
-	init();
-}
+let transactions = Array.isArray(localStorageTrasactions)
+  ? localStorageTrasactions
+      .filter((t) => t !== null && typeof t === "object" && t.name && typeof t.amount === "number" && !isNaN(t.amount))
+      .map((t) => ({ ...t, date: t.date || new Date().toISOString() }))
+  : [];
 
-const addTransactionIntoDOM = ({ amount, name, id }) => {
-	const operation = amount < 0 ? '-' : '+';
-	const CSSClass = amount < 0 ? 'minus' : 'plus';
-	const amountWithoutOperation = Math.abs(amount).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-	const li = document.createElement('li');
+const removeTransaction = (ID) => {
+  transactions = transactions.filter(({ id }) => id !== ID);
+  updateLocalStorage();
+  init();
+};
 
-	li.classList.add(CSSClass);
-	li.innerHTML = `
-	${name} <span>${operation} R$ ${amountWithoutOperation}</span>
-	<button class="delete-btn" onClick="removeTransaction(${id})">x</button>	
-`
+const addTransactionIntoDOM = ({ amount, name, id, date }, container, allowDelete = true) => {
+  const operation = amount < 0 ? "-" : "+";
+  const CSSClass = amount < 0 ? "minus" : "plus";
+  const amountWithoutOperation = Math.abs(amount).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const li = document.createElement("li");
 
-		transactionsUl.prepend(li)
-}
+  li.classList.add(CSSClass);
 
-const formatCurrencyBR = num => Number(num).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const deleteBtn = allowDelete ? `<button class="delete-btn" onClick="removeTransaction(${id})">x</button>` : "";
 
-const getExpense = transactionsAmount => formatCurrencyBR(Math.abs(transactionsAmount
-	.filter(value => value < 0)
-	.reduce((acc, value) => acc + value, 0)));
- 
+  let dateStr = "";
+  if (date) {
+    const d = new Date(date);
+    if (!isNaN(d.getTime())) {
+      dateStr = `<small style="color: #999; font-size: 0.85em; display: block; margin-top: 4px;">${d.toLocaleDateString("pt-BR")}</small>`;
+    }
+  }
 
-const getTotal = transactionsAmount => formatCurrencyBR(transactionsAmount
-	.reduce((acc, transaction) => acc + transaction, 0)); 
+  li.innerHTML = `
+	<div style="display: flex; flex-direction: column;">
+		<span>${name}</span>
+		${dateStr}
+	</div>
+	<span>${operation} R$ ${amountWithoutOperation}</span>
+	${deleteBtn}
+	`;
 
-const getIncome = transactionsAmount => formatCurrencyBR(transactionsAmount
-	.filter(value => value > 0)
-	.reduce((acc, value) => acc + value, 0)); 
+  container.prepend(li);
+};
 
-const updateBalanceValue = () => {
-	const transactionsAmount = transactions.map(({ amount }) => amount);
-	const total = getTotal(transactionsAmount)
-	const income = getIncome(transactionsAmount)
-	const expense = getExpense(transactionsAmount)
+const formatCurrencyBR = (num) => Number(num).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-	balancelDisplay.textContent = `R$ ${total}`
-	icomeDisplay.textContent = `R$ ${income}`
-	expenseDisplay.textContent = `R$ ${expense}`
-}
+const getExpense = (transactionsAmount) => formatCurrencyBR(Math.abs(transactionsAmount.filter((value) => value < 0).reduce((acc, value) => acc + value, 0)));
+
+const getTotal = (transactionsAmount) => formatCurrencyBR(transactionsAmount.reduce((acc, transaction) => acc + transaction, 0));
+
+const getIncome = (transactionsAmount) => formatCurrencyBR(transactionsAmount.filter((value) => value > 0).reduce((acc, value) => acc + value, 0));
+
+const updateBalanceValue = (transactionsList) => {
+  const transactionsAmount = transactionsList.map(({ amount }) => amount);
+  const total = getTotal(transactionsAmount);
+  const income = getIncome(transactionsAmount);
+  const expense = getExpense(transactionsAmount);
+
+  balancelDisplay.textContent = `R$ ${total}`;
+  icomeDisplay.textContent = `R$ ${income}`;
+  expenseDisplay.textContent = `R$ ${expense}`;
+};
 
 const init = () => {
-	transactionsUl.innerHTML = '';
-	transactions.forEach(addTransactionIntoDOM)
-	updateBalanceValue()
-}
+  transactionsUl.innerHTML = "";
+  const currentYearMonth = new Date().toISOString().slice(0, 7);
+
+  const currentMonthTransactions = transactions.filter((t) => t.date.startsWith(currentYearMonth));
+
+  currentMonthTransactions.forEach((t) => addTransactionIntoDOM(t, transactionsUl, true));
+  updateBalanceValue(currentMonthTransactions);
+};
 
 init();
 
 const updateLocalStorage = () => {
-	localStorage.setItem('transactions', JSON.stringify(transactions));
-}
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+};
 
 const generateId = () => Math.round(Math.random() * 1000);
 
-const addToTransactionArray = (transactionName, transactionAmount) => {
-	transactions.push({
-		id: generateId(),
-		name: transactionName,
-		amount: Number(transactionAmount),
-	});
-}
+const addToTransactionArray = (transactionName, transactionAmount, transactionDate) => {
+  transactions.push({
+    id: generateId(),
+    name: transactionName,
+    amount: Number(transactionAmount),
+    date: transactionDate || new Date().toISOString(),
+  });
+};
 
-const handleFormSubmit = event => {
-	event.preventDefault();
+const handleFormSubmit = (event) => {
+  event.preventDefault();
 
-	const transactionName = inputTransactionName.value.trim();
-	const transactionAmountStr = inputTransactionAmount.value.trim();
-	
-	const isNegative = transactionAmountStr.indexOf('-') > -1;
-	const cleanAmountStr = transactionAmountStr.replace(/\D/g, "");
-	const parsedAmount = (isNegative ? -1 : 1) * (Number(cleanAmountStr) / 100);
+  const transactionName = inputTransactionName.value.trim();
+  const transactionAmountStr = inputTransactionAmount.value.trim();
+  const transactionDateStr = inputTransactionDate ? inputTransactionDate.value.trim() : "";
 
-	const isSomeInputEmpty = transactionAmountStr === '' || transactionName === '';
+  const isNegative = transactionAmountStr.indexOf("-") > -1;
+  const cleanAmountStr = transactionAmountStr.replace(/\D/g, "");
+  const parsedAmount = (isNegative ? -1 : 1) * (Number(cleanAmountStr) / 100);
 
-	if (isSomeInputEmpty || cleanAmountStr === '') {
-		alert('Preencha tanto o nome quanto o valor da transação');
-		return
-	}
+  const isSomeInputEmpty = transactionAmountStr === "" || transactionName === "";
 
-	addToTransactionArray(transactionName, parsedAmount)
-	init();
-	updateLocalStorage();
-	form.reset();
-}
+  if (isSomeInputEmpty || cleanAmountStr === "") {
+    showError("Preencha tanto o nome quanto o valor da transação");
+    return;
+  }
 
-inputTransactionAmount.addEventListener('input', (e) => {
-	let value = e.target.value;
-	const isNegative = value.indexOf('-') > -1;
-	
-	value = value.replace(/\D/g, "");
+  let transactionDate = new Date().toISOString();
+  if (transactionDateStr) {
+    const [year, month, day] = transactionDateStr.split("-");
+    const d = new Date(year, month - 1, day);
+    if (!isNaN(d.getTime())) {
+      transactionDate = d.toISOString();
+    } else {
+      showError("Data inválida.");
+      return;
+    }
+  }
 
-	if (value === "") {
-		e.target.value = isNegative ? '-' : '';
-		return;
-	}
+  addToTransactionArray(transactionName, parsedAmount, transactionDate);
+  init();
+  updateLocalStorage();
+  form.reset();
+};
 
-	let numericValue = Number(value) / 100;
-	e.target.value = (isNegative ? '-' : '') + numericValue.toLocaleString('pt-BR', {
-		minimumFractionDigits: 2,
-		maximumFractionDigits: 2
-	});
+inputTransactionAmount.addEventListener("input", (e) => {
+  let value = e.target.value;
+  const isNegative = value.indexOf("-") > -1;
+
+  value = value.replace(/\D/g, "");
+
+  if (value === "") {
+    e.target.value = isNegative ? "-" : "";
+    return;
+  }
+
+  let numericValue = Number(value) / 100;
+  e.target.value =
+    (isNegative ? "-" : "") +
+    numericValue.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 });
 
-form.addEventListener('submit', handleFormSubmit);
+form.addEventListener("submit", handleFormSubmit);
+
+// --- History Modal Logic ---
+const historyModal = document.getElementById("history-modal");
+const closeModal = document.querySelector(".close-modal");
+const btnHistory = document.getElementById("btn-history");
+const historyMonthInput = document.getElementById("history-month");
+const modalTransactionsUl = document.getElementById("modal-transactions");
+const modalTitle = document.getElementById("modal-title");
+
+btnHistory.addEventListener("click", () => {
+  const selectedMonth = historyMonthInput.value;
+  if (!selectedMonth) {
+    showError("Por favor, selecione um mês no filtro.");
+    return;
+  }
+
+  const monthNames = {
+    "01": "Janeiro", "02": "Fevereiro", "03": "Março", "04": "Abril",
+    "05": "Maio", "06": "Junho", "07": "Julho", "08": "Agosto",
+    "09": "Setembro", "10": "Outubro", "11": "Novembro", "12": "Dezembro"
+  };
+
+  modalTitle.textContent = `Relatório de ${monthNames[selectedMonth]}`;
+
+  modalTransactionsUl.innerHTML = "";
+  
+  // Filtra as transações apenas pelo mês (ignora o ano)
+  const pastTransactions = transactions.filter((t) => {
+    if (!t.date) return false;
+    const transactionMonth = t.date.split("-")[1];
+    return transactionMonth === selectedMonth;
+  });
+
+  if (pastTransactions.length === 0) {
+    modalTransactionsUl.innerHTML = "<p>Nenhuma transação encontrada neste período.</p>";
+  } else {
+    pastTransactions.forEach((t) => addTransactionIntoDOM(t, modalTransactionsUl, false));
+  }
+
+  historyModal.classList.add("active");
+});
+
+closeModal.addEventListener("click", () => {
+  historyModal.classList.remove("active");
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === historyModal) {
+    historyModal.classList.remove("active");
+  }
+});
