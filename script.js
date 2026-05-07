@@ -173,6 +173,7 @@ const handleFormSubmit = (event) => {
   // Restore defaults after reset
   inputTransactionDate.value = today;
   setType("plus");
+  inputTransactionName.focus();
 };
 
 inputTransactionAmount.addEventListener("input", (e) => {
