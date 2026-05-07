@@ -7,6 +7,30 @@ const inputTransactionName = document.querySelector("#text");
 const inputTransactionAmount = document.querySelector("#amount");
 const inputTransactionDate = document.querySelector("#date");
 const errorMessage = document.querySelector("#error-message");
+const btnIncome = document.querySelector("#btn-income");
+const btnExpense = document.querySelector("#btn-expense");
+
+let transactionType = "plus"; // default
+
+const setType = (type) => {
+  transactionType = type;
+  if (type === "plus") {
+    btnIncome.classList.add("active");
+    btnExpense.classList.remove("active");
+  } else {
+    btnIncome.classList.remove("active");
+    btnExpense.classList.add("active");
+  }
+};
+
+btnIncome.addEventListener("click", () => setType("plus"));
+btnExpense.addEventListener("click", () => setType("minus"));
+
+// Set default date to today
+const today = new Date().toISOString().split("T")[0];
+if (inputTransactionDate) {
+  inputTransactionDate.value = today;
+}
 
 const showError = (message) => {
   errorMessage.textContent = message;
@@ -119,9 +143,8 @@ const handleFormSubmit = (event) => {
   const transactionAmountStr = inputTransactionAmount.value.trim();
   const transactionDateStr = inputTransactionDate ? inputTransactionDate.value.trim() : "";
 
-  const isNegative = transactionAmountStr.indexOf("-") > -1;
   const cleanAmountStr = transactionAmountStr.replace(/\D/g, "");
-  const parsedAmount = (isNegative ? -1 : 1) * (Number(cleanAmountStr) / 100);
+  const parsedAmount = (transactionType === "minus" ? -1 : 1) * (Number(cleanAmountStr) / 100);
 
   const isSomeInputEmpty = transactionAmountStr === "" || transactionName === "";
 
@@ -146,26 +169,26 @@ const handleFormSubmit = (event) => {
   init();
   updateLocalStorage();
   form.reset();
+  
+  // Restore defaults after reset
+  inputTransactionDate.value = today;
+  setType("plus");
 };
 
 inputTransactionAmount.addEventListener("input", (e) => {
   let value = e.target.value;
-  const isNegative = value.indexOf("-") > -1;
-
   value = value.replace(/\D/g, "");
 
   if (value === "") {
-    e.target.value = isNegative ? "-" : "";
+    e.target.value = "";
     return;
   }
 
   let numericValue = Number(value) / 100;
-  e.target.value =
-    (isNegative ? "-" : "") +
-    numericValue.toLocaleString("pt-BR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+  e.target.value = numericValue.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 });
 
 form.addEventListener("submit", handleFormSubmit);

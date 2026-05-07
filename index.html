@@ -41,11 +41,15 @@
             <input autofocus type="text" id="text" placeholder="Nome da transação" maxlength="45" autocomplete="off" />
           </div>
           <div class="form-control">
-            <label for="amount"
-              >Valor <br />
-              <small>(negativo - despesas, positivo - receitas)</small>
-            </label>
-            <input type="text" id="amount" inputmode="numeric" placeholder="Valor da transação (ex: -15,00)" autocomplete="off" />
+            <label>Tipo</label>
+            <div class="type-selector">
+              <button type="button" id="btn-income" class="type-btn active" data-type="plus">Receita</button>
+              <button type="button" id="btn-expense" class="type-btn" data-type="minus">Despesa</button>
+            </div>
+          </div>
+          <div class="form-control">
+            <label for="amount">Valor</label>
+            <input type="text" id="amount" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" />
           </div>
           <div class="form-control">
             <label for="date">Data da Transação</label>
